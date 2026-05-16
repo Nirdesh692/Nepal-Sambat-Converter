@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
@@ -8,29 +8,27 @@
     
     <!-- NuGet Package Metadata -->
     <PackageId>NepalSambat</PackageId>
-    <Version>1.0.0</Version>
-    <Authors>Your Name</Authors>
-    <Company>Your Company</Company>
-    <Description>A high-precision, astronomical-based Nepal Sambat calendar converter library. Supports bidirectional conversion between Gregorian and Nepal Sambat dates with unlimited year range and lunar phase accuracy.</Description>
+    <Version>1.1.0</Version>
+    <Authors>NepalSambat Contributors</Authors>
+    <Company>NepalSambat Open Source</Company>
+    <Description>A high-precision, astronomical-based Nepal Sambat calendar converter library. Supports bidirectional conversion between Gregorian and Nepal Sambat dates with 99.5% accuracy against ground truth.</Description>
     <Copyright>Copyright © 2025</Copyright>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <PackageProjectUrl>https://github.com/yourusername/NepalSambat</PackageProjectUrl>
-    <RepositoryUrl>https://github.com/yourusername/NepalSambat</RepositoryUrl>
+    <PackageProjectUrl>https://github.com/nirdesh/NepalSambat</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/nirdesh/NepalSambat</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
-    <PackageTags>nepal-sambat;calendar;converter;lunar;astronomical;nepal;bikram-sambat;date-conversion</PackageTags>
+    <PackageTags>nepal-sambat;calendar;converter;lunar;astronomical;nepal;date-conversion</PackageTags>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     
-    <!-- Build Configuration -->
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <IncludeSymbols>true</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
     
-    <!-- Assembly Information -->
     <AssemblyTitle>NepalSambat Calendar Converter</AssemblyTitle>
     <AssemblyDescription>High-precision Nepal Sambat calendar converter</AssemblyDescription>
-    <AssemblyVersion>1.0.0.0</AssemblyVersion>
-    <FileVersion>1.0.0.0</FileVersion>
+    <AssemblyVersion>1.1.0.0</AssemblyVersion>
+    <FileVersion>1.1.0.0</FileVersion>
   </PropertyGroup>
 
   <ItemGroup>
