@@ -8,14 +8,14 @@
     
     <!-- NuGet Package Metadata -->
     <PackageId>NepalSambat</PackageId>
-    <Version>1.1.0</Version>
+    <Version>1.1.2</Version>
     <Authors>NepalSambat Contributors</Authors>
     <Company>NepalSambat Open Source</Company>
     <Description>A high-precision, astronomical-based Nepal Sambat calendar converter library. Supports bidirectional conversion between Gregorian and Nepal Sambat dates with 99.5% accuracy against ground truth.</Description>
     <Copyright>Copyright © 2025</Copyright>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <PackageProjectUrl>https://github.com/nirdesh/NepalSambat</PackageProjectUrl>
-    <RepositoryUrl>https://github.com/nirdesh/NepalSambat</RepositoryUrl>
+    <PackageProjectUrl>https://github.com/nirdesh692/Nepal-Sambat-Converter</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/nirdesh692/Nepal-Sambat-Converter</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageTags>nepal-sambat;calendar;converter;lunar;astronomical;nepal;date-conversion</PackageTags>
     <PackageReadmeFile>README.md</PackageReadmeFile>
@@ -27,8 +27,8 @@
     
     <AssemblyTitle>NepalSambat Calendar Converter</AssemblyTitle>
     <AssemblyDescription>High-precision Nepal Sambat calendar converter</AssemblyDescription>
-    <AssemblyVersion>1.1.0.0</AssemblyVersion>
-    <FileVersion>1.1.0.0</FileVersion>
+    <AssemblyVersion>1.1.2.0</AssemblyVersion>
+    <FileVersion>1.1.2.0</FileVersion>
   </PropertyGroup>
 
   <ItemGroup>

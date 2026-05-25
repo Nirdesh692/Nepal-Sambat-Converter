@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using NepalSambat.Interfaces;
 using NepalSambat.Internal;
 using NepalSambat.Models;
 
@@ -11,41 +10,30 @@ namespace NepalSambat
     /// Provides methods for converting between Gregorian and Nepal Sambat calendars.
     /// This implementation uses high-precision astronomical calculations and matches traditional month boundaries.
     /// </summary>
-    public class NepalSambatConverter : INepalSambatConverter
+    public class NepalSambatConverter
     {
-        /// <summary>Gets the singleton instance of the converter.</summary>
-        public static NepalSambatConverter Instance { get; } = new NepalSambatConverter();
-
         private static readonly Dictionary<int, DateTime> _newYearCache = new();
         private static readonly Dictionary<int, int> _leapMonthCache = new();
 
         /// <summary>
         /// Converts a Gregorian date to a Nepal Sambat date.
         /// </summary>
-        public static NepalSambatDate FromGregorianDate(DateTime date) => Instance.FromGregorian(date);
-
-        /// <summary>
-        /// Converts a Nepal Sambat date to one or more corresponding Gregorian dates.
-        /// </summary>
-        public static DateTime[] ToGregorianDate(NepalSambatDate date) => Instance.ToGregorian(date);
-
-        /// <inheritdoc />
-        public NepalSambatDate FromGregorian(DateTime gregorianDate)
+        public static NepalSambatDate FromGregorian(DateTime gregorianDate)
         {
-            ValidateGregorianDate(gregorianDate);
-            int nsYear = FindNepalSambatYear(gregorianDate);
+            ValidateGregorianDateStatic(gregorianDate);
+            int nsYear = FindNepalSambatYearStatic(gregorianDate);
             
             // Search in the estimated year and its neighbors
             foreach (int year in new[] { nsYear, nsYear - 1, nsYear + 1 })
             {
                 if (year < 1) continue;
-                var months = GetMonthsInYear(year);
+                var months = GetMonthsInYearStatic(year);
                 foreach (var month in months)
                 {
                     if (gregorianDate.Date >= month.start.Date && gregorianDate.Date <= month.end.Date)
                     {
                         int tithi = AstronomicalCalculator.GetTithiAtSunrise(gregorianDate.Date);
-                        return new NepalSambatDate(year, GetFullMonthName(month.name, tithi), tithi, month.isLeap);
+                        return new NepalSambatDate(year, GetFullMonthNameStatic(month.name, tithi), tithi, month.isLeap);
                     }
                 }
             }
@@ -53,11 +41,13 @@ namespace NepalSambat
             throw new InvalidOperationException($"Date {gregorianDate:yyyy-MM-dd} could not be converted to Nepal Sambat.");
         }
 
-        /// <inheritdoc />
-        public DateTime[] ToGregorian(NepalSambatDate nsDate)
+        /// <summary>
+        /// Converts a Nepal Sambat date to one or more corresponding Gregorian dates.
+        /// </summary>
+        public static DateTime[] ToGregorian(NepalSambatDate nsDate)
         {
-            string baseName = GetBaseMonthName(nsDate.Month);
-            var months = GetMonthsInYear(nsDate.Year);
+            string baseName = GetBaseMonthNameStatic(nsDate.Month);
+            var months = GetMonthsInYearStatic(nsDate.Year);
 
             foreach (var month in months)
             {
@@ -85,14 +75,16 @@ namespace NepalSambat
             throw new InvalidOperationException($"Month '{nsDate.Month}' not found in NS year {nsDate.Year}.");
         }
 
-        /// <inheritdoc />
-        public bool IsLeapYear(int nsYear) => FindLeapMonthIndex(nsYear) >= 0;
+        /// <summary>
+        /// Determines if the specified Nepal Sambat year is a leap year.
+        /// </summary>
+        public static bool IsLeapYear(int nsYear) => FindLeapMonthIndexStatic(nsYear) >= 0;
 
         // ─────────────────────────────────────────────────────────────────────
         // Private Helpers
         // ─────────────────────────────────────────────────────────────────────
 
-        private int FindNepalSambatYear(DateTime date)
+        private static int FindNepalSambatYearStatic(DateTime date)
         {
             if (date.Date == CalendarConstants.Epoch.Date) return 1;
 
@@ -104,8 +96,8 @@ namespace NepalSambat
                 int testYear = approxYear + offset;
                 if (testYear < 1) continue;
 
-                DateTime testNewYear = CalculateNewYear(testYear);
-                DateTime nextNewYear = CalculateNewYear(testYear + 1);
+                DateTime testNewYear = CalculateNewYearStatic(testYear);
+                DateTime nextNewYear = CalculateNewYearStatic(testYear + 1);
 
                 if (date >= testNewYear && date < nextNewYear)
                     return testYear;
@@ -114,7 +106,7 @@ namespace NepalSambat
             return approxYear;
         }
 
-        private DateTime CalculateNewYear(int nsYear)
+        private static DateTime CalculateNewYearStatic(int nsYear)
         {
             if (_newYearCache.TryGetValue(nsYear, out DateTime cached)) return cached;
 
@@ -125,17 +117,17 @@ namespace NepalSambat
             DateTime nm = AstronomicalCalculator.FindNewMoonAtOrAfter(approx);
 
             // New Year starts the day after the Aunsi day
-            DateTime newYear = FindAunsiDay(nm).AddDays(1);
+            DateTime newYear = FindAunsiDayStatic(nm).AddDays(1);
             _newYearCache[nsYear] = newYear;
             return newYear;
         }
 
-        private List<(DateTime start, DateTime end, string name, bool isLeap)> GetMonthsInYear(int nsYear)
+        private static List<(DateTime start, DateTime end, string name, bool isLeap)> GetMonthsInYearStatic(int nsYear)
         {
-            DateTime yearStart = CalculateNewYear(nsYear);
-            DateTime nextYearStart = CalculateNewYear(nsYear + 1);
-            int leapIdx = FindLeapMonthIndex(nsYear);
-            var names = GetMonthNamesForYear(nsYear, leapIdx);
+            DateTime yearStart = CalculateNewYearStatic(nsYear);
+            DateTime nextYearStart = CalculateNewYearStatic(nsYear + 1);
+            int leapIdx = FindLeapMonthIndexStatic(nsYear);
+            var names = GetMonthNamesForYearStatic(nsYear, leapIdx);
 
             var result = new List<(DateTime, DateTime, string, bool)>();
             DateTime current = yearStart;
@@ -148,7 +140,7 @@ namespace NepalSambat
                 if (i < names.Length - 1)
                 {
                     DateTime nextNM = AstronomicalCalculator.FindNextNewMoon(current);
-                    monthEnd = FindAunsiDay(nextNM);
+                    monthEnd = FindAunsiDayStatic(nextNM);
                 }
                 else
                 {
@@ -165,12 +157,12 @@ namespace NepalSambat
             return result;
         }
 
-        private int FindLeapMonthIndex(int nsYear)
+        private static int FindLeapMonthIndexStatic(int nsYear)
         {
             if (_leapMonthCache.TryGetValue(nsYear, out int cached)) return cached;
 
-            DateTime yearStart = CalculateNewYear(nsYear);
-            DateTime nextYearStart = CalculateNewYear(nsYear + 1);
+            DateTime yearStart = CalculateNewYearStatic(nsYear);
+            DateTime nextYearStart = CalculateNewYearStatic(nsYear + 1);
             DateTime current = yearStart;
             int result = -1;
 
@@ -200,7 +192,7 @@ namespace NepalSambat
             return result;
         }
 
-        private DateTime FindAunsiDay(DateTime newMoon)
+        private static DateTime FindAunsiDayStatic(DateTime newMoon)
         {
             foreach (int offset in new[] { 1, 0, 2, -1 })
             {
@@ -211,7 +203,7 @@ namespace NepalSambat
             return newMoon.Date;
         }
 
-        private string[] GetMonthNamesForYear(int year, int leapIdx)
+        private static string[] GetMonthNamesForYearStatic(int year, int leapIdx)
         {
             if (leapIdx == -1) return (string[])CalendarConstants.MonthNames.Clone();
             
@@ -222,33 +214,27 @@ namespace NepalSambat
             return result;
         }
 
-        private string GetFullMonthName(string baseName, int tithi) => 
+        private static string GetFullMonthNameStatic(string baseName, int tithi) => 
             baseName + (tithi <= 15 ? CalendarConstants.BrightSuffix : CalendarConstants.DarkSuffix);
 
-        private string GetBaseMonthName(string month) => 
+        private static string GetBaseMonthNameStatic(string month) => 
             month.Replace(CalendarConstants.BrightSuffix, "").Replace(CalendarConstants.DarkSuffix, "");
 
-        private void ValidateGregorianDate(DateTime date)
+        private static void ValidateGregorianDateStatic(DateTime date)
         {
             if (date < CalendarConstants.Epoch)
                 throw new ArgumentException($"Date {date:yyyy-MM-dd} precedes NS epoch.");
-        }
-
-        private void ValidateNepalSambatDate(NepalSambatDate nsDate)
-        {
-            if (nsDate.Year < 1)
-                throw new ArgumentException("Invalid Nepal Sambat year.", nameof(nsDate));
         }
 
         // Used by NepalSambatDate for sorting
         internal static int GetMonthIndex(string monthName, bool isLeap, int nsYear)
         {
             bool isDark = monthName.EndsWith(CalendarConstants.DarkSuffix);
-            string baseName = Instance.GetBaseMonthName(monthName);
+            string baseName = GetBaseMonthNameStatic(monthName);
 
             if (isLeap)
             {
-                int leapBasePos = Instance.FindLeapMonthIndex(nsYear);
+                int leapBasePos = FindLeapMonthIndexStatic(nsYear);
                 return leapBasePos * 2 + (isDark ? 1 : 0);
             }
 
@@ -256,7 +242,7 @@ namespace NepalSambat
             int idx = list.IndexOf(baseName);
             if (idx == -1) return int.MaxValue;
 
-            int leapIdx = Instance.FindLeapMonthIndex(nsYear);
+            int leapIdx = FindLeapMonthIndexStatic(nsYear);
             if (leapIdx >= 0 && idx > leapIdx)
                 idx++;
 
